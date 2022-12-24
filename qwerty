@@ -1,0 +1,65 @@
+import pandas as pd
+df = pd.read_csv('train.csv')
+df.drop(['id','bdate','has_photo','has_mobile','city','followers_count','graduation','relation'],axis=1, inplace=True)
+male = 0
+female = 0
+def male_female_undergraduate(row):
+    global male, female
+    if row['sex'] == 2 and row['education_status'] == 'undergraduate applicant':
+        male += 1
+    if row['sex'] == 1 and row['education_status'] == 'undergraduate applicant':
+        female += 1
+        return False
+df.apply(male_female_undergraduate,axis = 1)
+s = pd.Series(data = [female,male],
+index = ['Men','Women'])
+s.plot(kind = 'barh')
+plt.show()
+
+#print(df['sex'].value_counts())
+def sex_apply(sex):
+    if sex == 2:
+        return 0
+    return 1
+df['sex'] = df['sex'].apply(sex_apply)
+#print(df['education_form'].value_counts())
+df[list(pd.get_dummies(df['education_form']).columns)] = pd.get_dummies(df['education_form'])
+df.drop(['education_form'], axis= 1, inplace = True)
+def edu_status_apply(edu):
+    if edu == 'Undergraduate applicant':
+        return 0
+    elif edu == 'Student (Masters"s' or edu == "Student (Bachelor's" or edu == "Student (Specialist)":
+        return 1
+    elif edu == "Alumnus (Master's" or edu == "Alumnus (Bachelor's" or edu == "Alumnus (Specialist)":
+        return 2
+
+
+
+    else:
+
+
+        return 3
+df['education_ststus'] = df['education_status'].apply(edu_status_apply)
+def langs_apply(langs):
+    if langs.find('Русский') !=-1:
+        return 1
+    else:
+        return 0
+df['langs'] = df['langs'].apply(langs_apply)
+df['occupation_type'].fillna('university', inplace=True)
+def ocu_type_apply(ocu):
+    if ocu == 'work':
+        return 0
+    else:
+        return 1
+df['occupation_type'] = df['occupation_type'].apply(oce_type_apply)
+print(df['occupaion_type'].value_counts())
+df.info()
+
+
+
+
+
+
+
+
